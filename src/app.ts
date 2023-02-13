@@ -1,7 +1,13 @@
+import "reflect-metadata";
 import express, { Express } from "express";
 import * as env from "dotenv";
+import bodyParser from "body-parser";
 import { json } from "body-parser";
 import mongoose, { MongooseOptions } from "mongoose";
+import { InversifyExpressServer } from "inversify-express-utils";
+import container from "./util/inversify_config/inversify.config";
+import "./controllers/team.controller";
+import "./controllers/employee.controller";
 env.config();
 
 export class App {
@@ -32,12 +38,22 @@ export class App {
   public async start() {
     this.connection();
     this.initialMiddleware();
-    this.server.listen(this.port, () => {
-      console.log(`Server is running on port ${this.port}.`);
-    });
+    const appConfigured = new InversifyExpressServer(
+      container,
+      null,
+      { rootPath: "/api" },
+      this.server
+    ).build();
+
+    appConfigured.listen(this.port, () =>
+      console.log(`Server listening on http://localhost:${this.port}`)
+    );
   }
   public initialMiddleware() {
     this.server.set("trust proxy", true);
     this.server.use(json());
+    this.server.use(bodyParser.json());
+    this.server.use(express.json());
+    this.server.use(express.urlencoded({ extended: true }));
   }
 }

@@ -57,5 +57,5 @@ const EmployeeSchema: Schema = new Schema<IEmployee>(
   { versionKey: false }
 );
 
-const Employee = model("Employee", EmployeeSchema);
+const Employee = model<IEmployee>("Employee", EmployeeSchema);
 export default Employee;
