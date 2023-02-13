@@ -7,7 +7,7 @@ import {
   httpPut,
   httpDelete,
 } from "inversify-express-utils";
-import { NextFunction, Response, Request } from "express";
+import { Response, Request } from "express";
 
 import { TYPES } from "../util/inversify_config/types";
 import { ITeamService } from "../interfaces/team/ITeamService.interface";
@@ -22,7 +22,7 @@ export default class TeamsController {
   }
 
   @httpPost("/add")
-  async addTeam(request: Request, response: Response, next: NextFunction) {
+  async addTeam(request: Request, response: Response) {
     try {
       const team: ITeam = request.body;
       const newTeam = await this._teamService.addTeam(team);

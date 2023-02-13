@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import { inject } from "inversify";
+import generator from "generate-password";
 import {
   controller,
   httpPost,
@@ -26,6 +27,10 @@ export default class EmployeeController {
   async addEmployee(request: Request, response: Response) {
     try {
       const emp: IEmployee = request.body;
+      emp.password = generator.generate({
+        length: 10,
+        numbers: true,
+      });
       console.log(request.body);
       const employee = await this._employeeService.addEmp(emp);
       response.status(200).send(employee);
