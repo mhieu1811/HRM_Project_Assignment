@@ -6,8 +6,6 @@ import { ITeamService } from "../../interfaces/team/ITeamService.interface";
 import { EmployeeService } from "../../services/employee.service";
 import { TeamService } from "../../services/team.service";
 
-type T = any;
-
 const container = new Container();
 
 container

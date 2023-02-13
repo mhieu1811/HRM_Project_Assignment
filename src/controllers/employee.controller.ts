@@ -5,6 +5,7 @@ import {
   httpPost,
   httpGet,
   httpPut,
+  httpDelete,
 } from "inversify-express-utils";
 import { Response, Request } from "express";
 
@@ -49,6 +50,18 @@ export default class EmployeeController {
   async updateEmployee(request: Request, response: Response) {
     try {
       const emp: IEmployee = request.body.employee;
+      const empId: string = request.body.id;
+      const updateEmp = await this._employeeService.updateEmp(emp, empId);
+      return response.status(204).json(updateEmp);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  @httpDelete("/delete/:id")
+  async deleteEmp(request: Request, response: Response) {
+    try {
+      const emp: IEmployee = request.body.employee;
+      emp.isDeleted = true;
       const empId: string = request.body.id;
       const updateEmp = await this._employeeService.updateEmp(emp, empId);
       return response.status(204).json(updateEmp);
