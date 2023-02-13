@@ -20,6 +20,6 @@ const TeamSchema: Schema = new Schema<ITeam>(
   { versionKey: false }
 );
 
-const Team = model("Team", TeamSchema);
+const Team = model<ITeam>("Team", TeamSchema);
 
 export default Team;
