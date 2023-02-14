@@ -26,21 +26,14 @@ const EmployeeSchema: Schema = new Schema<IEmployee>(
       enum: role,
       default: role.member,
     },
-    dob: {
-      type: String,
-      required: true,
-    },
 
-    // team: [
-    //   {
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Team",
-    //   },
-    // ],
-    phoneNumber: {
-      type: String,
-      required: true,
-    },
+    team: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Team",
+      },
+    ],
+
     status: {
       type: Boolean,
       default: true,

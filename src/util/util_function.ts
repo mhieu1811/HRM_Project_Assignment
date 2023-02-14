@@ -1,5 +1,5 @@
 import Employee from "../models/employee.model";
-import generator from "generate-password";
+// import generator from "generate-password";
 import bcrypt from "bcryptjs";
 
 export async function uniqeEmail(email: string): Promise<boolean> {
@@ -13,4 +13,8 @@ export function generatePassword(): string {
   const password = "HYa24@1haj";
   const hashPassword = bcrypt.hashSync(password, 10);
   return hashPassword;
+}
+export function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
 }

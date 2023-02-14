@@ -2,6 +2,7 @@ import { injectable } from "inversify";
 import { IEmployee } from "../interfaces/employee/IEmployee.interface";
 import { IEmployeeService } from "../interfaces/employee/IEmployeeService.interface";
 import Employee from "../models/employee.model";
+import NotFoundError from "../util/appErrors/errors/notFound.error";
 import { ISearch, IPaginate } from "../util/query.interface";
 
 @injectable()
@@ -51,7 +52,7 @@ export class EmployeeService implements IEmployeeService {
     );
 
     if (!currentEmp) {
-      throw new Error("Not found Employee!");
+      throw new NotFoundError("Not found Employee!");
     }
 
     return currentEmp;

@@ -11,6 +11,7 @@ import "./controllers/employee.controller";
 import "./controllers/user.controller";
 import { Request, Response, NextFunction } from "express";
 import logger from "./util/logger";
+import BaseError from "./util/appErrors/base.error";
 env.config();
 
 export class App {
@@ -51,7 +52,10 @@ export class App {
       app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
         if (err) {
           logger.error(err.message);
-          res.status(500).json({ message: err.message });
+          if (err instanceof BaseError) {
+            return res.status(err.statusCode).json({ message: err.message });
+          }
+          return res.status(500).json({ message: err.message });
         }
         next();
       });

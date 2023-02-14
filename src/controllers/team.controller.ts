@@ -12,6 +12,8 @@ import { Response, Request } from "express";
 import { TYPES } from "../util/inversify_config/types";
 import { ITeamService } from "../interfaces/team/ITeamService.interface";
 import { ITeam } from "../interfaces/team/ITeam.interface";
+import { getErrorMessage } from "../util/util_function";
+import logger from "../util/logger";
 
 @controller("/teams")
 export default class TeamsController {
@@ -28,8 +30,7 @@ export default class TeamsController {
       const newTeam = await this._teamService.addTeam(team);
       return response.status(200).json(newTeam);
     } catch (error) {
-      //return res.status(err.statusCode).send({ message: err.message });
-      console.log(error);
+      throw error;
     }
   }
 
@@ -43,7 +44,7 @@ export default class TeamsController {
 
       return response.status(200).json(team);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
@@ -55,7 +56,7 @@ export default class TeamsController {
       const createTeam = await this._teamService.updateTeam(team, id);
       return response.status(200).json(createTeam);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
@@ -68,7 +69,7 @@ export default class TeamsController {
       const createTeam = await this._teamService.updateTeam(team, id);
       return response.status(200).json(createTeam);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 }
