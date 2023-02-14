@@ -27,13 +27,6 @@ const EmployeeSchema: Schema = new Schema<IEmployee>(
       default: role.member,
     },
 
-    team: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Team",
-      },
-    ],
-
     status: {
       type: Boolean,
       default: true,
@@ -43,8 +36,10 @@ const EmployeeSchema: Schema = new Schema<IEmployee>(
       default: false,
     },
   },
-  { versionKey: false }
+  { versionKey: false },
 );
 
 const Employee = model<IEmployee>("Employee", EmployeeSchema);
+
+
 export default Employee;

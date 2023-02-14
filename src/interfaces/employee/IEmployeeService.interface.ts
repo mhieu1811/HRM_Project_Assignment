@@ -6,4 +6,6 @@ export interface IEmployeeService {
   getEmp(employeeId: string): Promise<IEmployee>;
   deleteEmp(employeeId: string): Promise<IEmployee | null>;
   getEmpList(optionsMatch: ISearch, paginateParams: IPaginate): void;
+  empIsLeader(empId: string): Promise<boolean>;
+  empIsMember(empId: string): Promise<boolean>;
 }

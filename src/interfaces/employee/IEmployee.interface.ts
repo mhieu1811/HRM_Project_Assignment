@@ -6,7 +6,6 @@ export interface IEmployee extends Document {
   email: string;
   name: string;
   password: string;
-  team: Array<ITeam>;
   role: role;
   status: boolean;
   isDeleted: boolean;
