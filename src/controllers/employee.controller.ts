@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import { inject } from "inversify";
-
 import {
   controller,
   httpPost,
@@ -12,7 +11,6 @@ import { Response, Request } from "express";
 import { TYPES } from "../util/inversify_config/types";
 import { IEmployeeService } from "../interfaces/employee/IEmployeeService.interface";
 import { IEmployee } from "../interfaces/employee/IEmployee.interface";
-import { generate } from "generate-password";
 import { generatePassword, uniqeEmail } from "../util/util_function";
 
 // import logger from "../util/logger";
@@ -29,17 +27,20 @@ export default class EmployeeController {
   async addEmployee(request: Request, response: Response) {
     try {
       const emp: IEmployee = request.body;
+
       //check uniqe email
       const isEmailValid = await uniqeEmail(emp.email);
       if (!isEmailValid) throw new Error("email not valid");
+
       //generate and hash password
       emp.password = generatePassword();
 
       const employee = await this._employeeService.addEmp(emp);
 
       response.status(200).send(employee);
-    } catch (err) {
-      throw new Error("error");
+    } catch (err: any) {
+      console.log(err);
+      throw new Error(err["message"]);
     }
   }
 

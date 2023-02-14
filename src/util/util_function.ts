@@ -10,13 +10,7 @@ export async function uniqeEmail(email: string): Promise<boolean> {
 }
 
 export function generatePassword(): string {
-  const password = generator.generate({
-    length: 10,
-    numbers: true,
-    uppercase: true,
-    symbols: true,
-    strict: true,
-  });
+  const password = "HYa24@1haj";
   const hashPassword = bcrypt.hashSync(password, 10);
   return hashPassword;
 }

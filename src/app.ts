@@ -8,6 +8,7 @@ import { InversifyExpressServer } from "inversify-express-utils";
 import container from "./util/inversify_config/inversify.config";
 import "./controllers/team.controller";
 import "./controllers/employee.controller";
+import "./controllers/user.controller";
 env.config();
 
 export class App {
