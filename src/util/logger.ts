@@ -6,7 +6,12 @@ const options: winston.LoggerOptions = {
       level: process.env.NODE_ENV === "production" ? "error" : "debug",
     }),
     new winston.transports.File({ filename: "debug.log", level: "debug" }),
+    new winston.transports.File({ filename: "error.log", level: "error" }),
   ],
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
   exitOnError: false,
 };
 

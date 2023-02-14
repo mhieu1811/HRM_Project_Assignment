@@ -9,6 +9,8 @@ import container from "./util/inversify_config/inversify.config";
 import "./controllers/team.controller";
 import "./controllers/employee.controller";
 import "./controllers/user.controller";
+import { Request, Response, NextFunction } from "express";
+import logger from "./util/logger";
 env.config();
 
 export class App {
@@ -44,17 +46,31 @@ export class App {
       null,
       { rootPath: "/api" },
       this.server
-    ).build();
-
-    appConfigured.listen(this.port, () =>
+    );
+    appConfigured.setErrorConfig((app) => {
+      app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+        if (err) {
+          logger.error(err.message);
+          res.status(500).json({ message: err.message });
+        }
+        next();
+      });
+    });
+    const app = appConfigured.build();
+    app.listen(this.port, () =>
       console.log(`Server listening on http://localhost:${this.port}`)
     );
   }
   public initialMiddleware() {
-    this.server.set("trust proxy", true);
+    // process.on("unhandledRejection", (error: Error, response: Response) => {
+    //   logger.error(error.message);
+    //   response.status(500).send({ message: error.message });
+    // });
+
     this.server.use(json());
     this.server.use(bodyParser.json());
     this.server.use(express.json());
     this.server.use(express.urlencoded({ extended: true }));
+    // src/process.ts
   }
 }

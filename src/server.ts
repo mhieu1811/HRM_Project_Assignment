@@ -1,11 +1,12 @@
 import { App } from "./app";
+import logger from "./util/logger";
 
 export const start = async () => {
   try {
     const app = new App();
     await app.start();
   } catch (err) {
-    console.error(err);
+    logger.error(err);
   }
 };
 
