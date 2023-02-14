@@ -9,7 +9,7 @@ import logger from "../util/logger";
 export function isLogin(
   request: Request,
   response: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const tokenString = request.header("Authorization");
@@ -34,21 +34,24 @@ export function isLogin(
 export function isAdmin(
   request: Request,
   response: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     Employee.findById(request.body["loginUser"]["id"]).exec(
       (error: Error | null, employee) => {
-        if (error) throw new InternalServerError(error.message);
-        if (!employee) throw new UnAuthorize("UnAuthorized");
+        if (error) next(new InternalServerError(error.message));
+        if (!employee) {
+          next(new UnAuthorize("UnAuthorized"));
+          return;
+        }
         const role = employee.role;
         if (role === "Admin") {
           request.body["loginUser"]["role"] = role;
           next();
           return;
         }
-        throw new UnAuthorize("UnAuthorized");
-      }
+        next(new UnAuthorize("UnAuthorized"));
+      },
     );
   } catch (error) {
     next(error);
@@ -58,16 +61,18 @@ export function isAdmin(
 export function isLeader(
   request: Request,
   response: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     Employee.findById(request.body["loginUser"]["id"]).exec(
       (error: Error | null, employee) => {
         if (error) {
-          throw new InternalServerError(error.message);
+          next(new InternalServerError(error.message));
+          return;
         }
         if (!employee) {
-          throw new UnAuthorize("UnAuthorized");
+          next(new UnAuthorize("UnAuthorized"));
+          return;
         }
         const role = employee.role;
         console.log(role);
@@ -77,8 +82,8 @@ export function isLeader(
           return;
         }
         // case sai sẽ sai
-        throw new UnAuthorize("UnAuthorized");
-      }
+        next(new UnAuthorize("UnAuthorized"));
+      },
     );
   } catch (error) {
     next(error);
