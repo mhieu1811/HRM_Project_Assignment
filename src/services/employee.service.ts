@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 import { IEmployee } from "../interfaces/employee/IEmployee.interface";
 import { IEmployeeService } from "../interfaces/employee/IEmployeeService.interface";
 import Employee from "../models/employee.model";
-import { ISearch, ISort, IPaginate } from "../util/query.interface";
+import { ISearch, IPaginate } from "../util/query.interface";
 
 @injectable()
 export class EmployeeService implements IEmployeeService {
@@ -17,12 +17,38 @@ export class EmployeeService implements IEmployeeService {
     employeeId: string
   ): Promise<IEmployee | null> {
     await this.getEmp(employeeId);
-    await Employee.updateOne({ _id: employeeId }, employee);
-    const updateEmp: IEmployee | null = await Employee.findById(employeeId);
+    await Employee.findOneAndUpdate({ _id: employeeId }, employee).exec();
+    const updateEmp: IEmployee | null = await await Employee.findOne(
+      {
+        _id: employeeId,
+      },
+      { isDeleted: false }
+    );
     return updateEmp;
   }
+
+  async deleteEmp(employeeId: string): Promise<IEmployee | null> {
+    await this.getEmp(employeeId);
+    await Employee.findOneAndUpdate(
+      { _id: employeeId },
+      { isDeleted: true }
+    ).exec();
+    const updateEmp: IEmployee | null = await await Employee.findOne(
+      {
+        _id: employeeId,
+      },
+      { isDeleted: false }
+    );
+    return updateEmp;
+  }
+
   async getEmp(employeeId: string): Promise<IEmployee> {
-    const currentEmp: IEmployee | null = await Employee.findById(employeeId);
+    const currentEmp: IEmployee | null = await Employee.findOne(
+      {
+        _id: employeeId,
+      },
+      { isDeleted: false }
+    );
 
     if (!currentEmp) {
       throw new Error("Not found Employee!");

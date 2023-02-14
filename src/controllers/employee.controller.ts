@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { inject } from "inversify";
-import generator from "generate-password";
+
 import {
   controller,
   httpPost,
@@ -9,10 +9,12 @@ import {
   httpDelete,
 } from "inversify-express-utils";
 import { Response, Request } from "express";
-
 import { TYPES } from "../util/inversify_config/types";
 import { IEmployeeService } from "../interfaces/employee/IEmployeeService.interface";
 import { IEmployee } from "../interfaces/employee/IEmployee.interface";
+import { generate } from "generate-password";
+import { generatePassword, uniqeEmail } from "../util/util_function";
+
 // import logger from "../util/logger";
 
 @controller("/employees")
@@ -23,18 +25,22 @@ export default class EmployeeController {
     this._employeeService = employeeService;
   }
 
-  @httpPost("/add")
+  @httpPost("/")
   async addEmployee(request: Request, response: Response) {
     try {
       const emp: IEmployee = request.body;
-      emp.password = generator.generate({
-        length: 10,
-        numbers: true,
-      });
-      console.log(request.body);
+      //check uniqe email
+      const isEmailValid = await uniqeEmail(emp.email);
+      if (!isEmailValid) throw new Error("email not valid");
+      //generate and hash password
+      emp.password = generatePassword();
+
       const employee = await this._employeeService.addEmp(emp);
+
       response.status(200).send(employee);
-    } catch (err) {}
+    } catch (err) {
+      throw new Error("error");
+    }
   }
 
   @httpGet("/:id")
@@ -45,33 +51,37 @@ export default class EmployeeController {
 
       if (employee === null) return response.status(404);
 
-      return response.status(200).json(employee);
+      response.status(200).json(employee);
     } catch (error) {
-      console.log(error);
+      throw new Error("error");
     }
   }
 
-  @httpPut("/update")
+  @httpPut("/:id")
   async updateEmployee(request: Request, response: Response) {
     try {
       const emp: IEmployee = request.body.employee;
-      const empId: string = request.body.id;
-      const updateEmp = await this._employeeService.updateEmp(emp, empId);
-      return response.status(204).json(updateEmp);
+      const empId: string = request.params.id;
+
+      await this._employeeService.updateEmp(emp, empId);
+
+      response.status(204);
     } catch (error) {
       console.log(error);
+      throw new Error("error");
     }
   }
-  @httpDelete("/delete/:id")
+  @httpDelete("/:id")
   async deleteEmp(request: Request, response: Response) {
     try {
-      const emp: IEmployee = request.body.employee;
-      emp.isDeleted = true;
-      const empId: string = request.body.id;
-      const updateEmp = await this._employeeService.updateEmp(emp, empId);
-      return response.status(204).json(updateEmp);
+      const empId: string = request.params.id;
+
+      await this._employeeService.deleteEmp(empId);
+
+      response.status(204);
     } catch (error) {
       console.log(error);
+      throw new Error("error");
     }
   }
 }

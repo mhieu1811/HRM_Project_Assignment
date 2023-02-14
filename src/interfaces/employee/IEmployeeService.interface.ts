@@ -4,5 +4,6 @@ export interface IEmployeeService {
   addEmp(employee: IEmployee): Promise<IEmployee>;
   updateEmp(employee: IEmployee, employeeId: string): Promise<IEmployee | null>;
   getEmp(employeeId: string): Promise<IEmployee>;
+  deleteEmp(employeeId: string): Promise<IEmployee | null>;
   getEmpList(optionsMatch: ISearch, paginateParams: IPaginate): void;
 }

@@ -13,10 +13,6 @@ const EmployeeSchema: Schema = new Schema<IEmployee>(
       ],
     },
     name: { type: String, required: true },
-    username: {
-      type: String,
-      required: true,
-    },
     password: {
       type: String,
       required: true,
@@ -35,12 +31,12 @@ const EmployeeSchema: Schema = new Schema<IEmployee>(
       required: true,
     },
 
-    team: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Team",
-      },
-    ],
+    // team: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Team",
+    //   },
+    // ],
     phoneNumber: {
       type: String,
       required: true,
