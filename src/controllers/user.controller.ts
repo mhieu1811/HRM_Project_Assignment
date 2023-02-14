@@ -28,7 +28,7 @@ export default class UserController {
 
   constructor(
     @inject(TYPES.User) userService: UserService,
-    @inject(TYPES.Employee) employeeService: IEmployeeService
+    @inject(TYPES.Employee) employeeService: IEmployeeService,
   ) {
     this._userService = userService;
     this._employeeService = employeeService;
@@ -53,7 +53,15 @@ export default class UserController {
 
       const personal: IEmployee = await this._employeeService.getEmp(userId);
 
-      return response.status(200).json({ data: personal });
+      return response
+        .status(200)
+        .json({
+          data: {
+            email: personal.email,
+            name: personal.name,
+            role: personal.role,
+          },
+        });
     } catch (error) {
       throw error;
     }
