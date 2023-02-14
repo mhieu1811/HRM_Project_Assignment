@@ -8,4 +8,6 @@ export interface ITeamService {
   assignTeamLeader(empId: string, teamId: string): Promise<ITeam | null>;
   assignMember(empId: string, teamId: string): Promise<ITeam | null>;
   deleteMember(empId: string, teamId: string): Promise<ITeam | null>;
+  getTeamByMember(empId: string): Promise<Array<ITeam> | null>;
+  getTeamByLeader(empId: string): Promise<Array<ITeam> | null>;
 }

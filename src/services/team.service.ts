@@ -34,6 +34,7 @@ export class TeamService implements ITeamService {
   getTeamList(name: string): void {
     console.log("getTeamList");
   }
+
   async assignMember(empId: string, teamId: string): Promise<ITeam | null> {
     const currentTeam: ITeam | null = await Team.findOne(
       {
@@ -126,5 +127,20 @@ export class TeamService implements ITeamService {
     );
 
     return updateTeam;
+  }
+
+  async getTeamByMember(empId: string): Promise<Array<ITeam> | null> {
+    const listMember: Array<ITeam> | null = await Team.find({
+      members: { $elemMatch: { _id: new Types.ObjectId(empId) } },
+    });
+    if (!listMember) return null;
+    return listMember;
+  }
+  async getTeamByLeader(empId: string): Promise<Array<ITeam> | null> {
+    const listMember: Array<ITeam> | null = await Team.find({
+      leaderID: new Types.ObjectId(empId),
+    });
+    if (!listMember) return null;
+    return listMember;
   }
 }

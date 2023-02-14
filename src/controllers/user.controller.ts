@@ -18,6 +18,9 @@ import container from "../util/inversify_config/inversify.config";
 import { IEmployeeService } from "../interfaces/employee/IEmployeeService.interface";
 import { Types } from "mongoose";
 import { IEmployee } from "../interfaces/employee/IEmployee.interface";
+import { IListTeam } from "../interfaces/team/IListTeam.interface";
+import { ITeamService } from "../interfaces/team/ITeamService.interface";
+import { ITeam } from "../interfaces/team/ITeam.interface";
 
 // import logger from "../util/logger";
 
@@ -25,13 +28,16 @@ import { IEmployee } from "../interfaces/employee/IEmployee.interface";
 export default class UserController {
   private _userService: IUserService;
   private _employeeService: IEmployeeService;
+  private _teamService: ITeamService;
 
   constructor(
     @inject(TYPES.User) userService: UserService,
     @inject(TYPES.Employee) employeeService: IEmployeeService,
+    @inject(TYPES.Team) teamService: ITeamService,
   ) {
     this._userService = userService;
     this._employeeService = employeeService;
+    this._teamService = teamService;
   }
 
   @httpPost("/login")
@@ -50,18 +56,25 @@ export default class UserController {
   async getPersonalInformation(request: Request, response: Response) {
     try {
       const userId = request.body["loginUser"]["id"];
+      const role = request.body["loginUser"]["role"];
 
       const personal: IEmployee = await this._employeeService.getEmp(userId);
+      let team: Array<IListTeam> | null = null;
 
-      return response
-        .status(200)
-        .json({
-          data: {
-            email: personal.email,
-            name: personal.name,
-            role: personal.role,
-          },
-        });
+      if (role === "Leader") {
+        team = await this._teamService.getTeamByLeader(userId);
+      } else if (role === "Member") {
+        team = await this._teamService.getTeamByMember(userId);
+      }
+
+      return response.status(200).json({
+        data: {
+          email: personal.email,
+          name: personal.name,
+          role: personal.role,
+          team: team,
+        },
+      });
     } catch (error) {
       throw error;
     }
