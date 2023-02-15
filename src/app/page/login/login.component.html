@@ -1,0 +1,4 @@
+<input type="text" [(ngModel)]="email" (ngModelChange)="email = $event" />
+<input type="text" [(ngModel)]="password" (ngModelChange)="password = $event" />
+
+<button (click)="login()">Login</button>
