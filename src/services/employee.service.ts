@@ -5,6 +5,8 @@ import { IReturnEmployee } from "../interfaces/employee/IReturnEmployee.interfac
 import Employee from "../models/employee.model";
 import NotFoundError from "../util/appErrors/errors/notFound.error";
 import bcrypt from "bcryptjs";
+import Team from "../models/team.model";
+import { ITeam } from "../interfaces/team/ITeam.interface";
 
 @injectable()
 export class EmployeeService implements IEmployeeService {
@@ -35,17 +37,22 @@ export class EmployeeService implements IEmployeeService {
 
   async deleteEmp(employeeId: string): Promise<IReturnEmployee | null> {
     await this.getEmp(employeeId);
-    await Employee.findOneAndUpdate(
-      { _id: employeeId },
-      { isDeleted: true }
-    ).exec();
-    const updateEmp: IReturnEmployee | null = await await Employee.findOne(
+    await Employee.findOneAndUpdate({ _id: employeeId }, { isDeleted: true });
+    const teamAssigned: Array<ITeam> | null = await Team.find()
+      .where("members")
+      .in([employeeId])
+      .select("_id");
+
+    await Team.where("_id")
+      .in([teamAssigned])
+      .updateMany({ $pull: { members: employeeId } });
+    const deleteEmp: IReturnEmployee | null = await await Employee.findOne(
       {
         _id: employeeId,
       },
       { isDeleted: false }
     ).select("-password -isDeleted");
-    return updateEmp;
+    return deleteEmp;
   }
 
   async getEmp(employeeId: string): Promise<IReturnEmployee> {

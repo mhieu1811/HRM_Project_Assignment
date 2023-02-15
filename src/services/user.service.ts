@@ -10,13 +10,14 @@ import { IJwtFormat } from "../interfaces/user/JWT.interface";
 @injectable()
 export class UserService implements IUserService {
   async login(user: IUser): Promise<string> {
-    const userLogin = await Employee.findOne({ email: user.email });
+    if (!user.email) throw new Error("missing email");
+    const userLogin = await Employee.findOne({ email: user["email"] });
 
     if (!userLogin) throw new UnAuthorize("Wrong email or password");
 
     const passwordIsvalid = bcrypt.compareSync(
       user.password,
-      userLogin.password,
+      userLogin.password
     );
 
     if (!passwordIsvalid) throw new UnAuthorize("Wrong email or password");

@@ -74,7 +74,7 @@ export default class TeamsController {
   @httpPost(
     "/deleteMember",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin")
+    container.get<express.RequestHandler>("isLeader")
   )
   async deleteMember(request: Request, response: Response) {
     try {

@@ -18,7 +18,7 @@ export function isLogin(
     }
     jwt.verify(token, "hieulaiminh", (err, decoded) => {
       if (err || !decoded) {
-        return response.status(401).send({ message: err });
+        throw err;
       }
       request.body["loginUser"] = decoded;
       next();
