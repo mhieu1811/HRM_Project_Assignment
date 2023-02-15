@@ -15,12 +15,14 @@ export class TeamService implements ITeamService {
     await newTeam.save();
     return newTeam;
   }
+
   async updateTeam(team: ITeam, teamId: string): Promise<ITeam | null> {
     await this.getTeam(teamId);
     await Team.updateOne({ _id: teamId }, team);
     const updateEmp: ITeam | null = await Team.findById(teamId);
     return updateEmp;
   }
+
   async getTeam(teamId: string): Promise<ITeam | null> {
     const currentTeam: ITeam | null = await Team.findById(teamId)
       .populate("leaderID")
@@ -31,8 +33,11 @@ export class TeamService implements ITeamService {
     }
     return currentTeam;
   }
-  getTeamList(name: string): void {
-    console.log("getTeamList");
+  async getTeamList(): Promise<Array<ITeam> | null> {
+    const listTeam: Array<ITeam> | null = await Team.find({
+      isDeleted: false,
+    }).select("-members -leaderID");
+    return listTeam;
   }
 
   async assignMember(empId: string, teamId: string): Promise<ITeam | null> {
@@ -40,7 +45,7 @@ export class TeamService implements ITeamService {
       {
         _id: teamId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
     if (!currentTeam) throw new NotFoundError("Team do not exist");
 
@@ -54,20 +59,20 @@ export class TeamService implements ITeamService {
       {
         _id: empId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
     if (!currentEmp) throw new NotFoundError("Employee do not exist");
 
     await await Team.findOneAndUpdate(
       { _id: teamId },
-      { $push: { members: empId } },
+      { $push: { members: empId } }
     );
 
     const updateTeam: ITeam | null = await Team.findOne(
       {
         _id: teamId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
     return updateTeam;
   }
@@ -77,7 +82,7 @@ export class TeamService implements ITeamService {
       {
         _id: empId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
     console.log(empId);
     if (!currentEmp) throw new NotFoundError("Employee do not exist");
@@ -87,7 +92,7 @@ export class TeamService implements ITeamService {
       {
         _id: teamId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
 
     if (!currentTeam) throw new NotFoundError("Team do not exist");
@@ -98,7 +103,7 @@ export class TeamService implements ITeamService {
       {
         _id: teamId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
 
     return updateTeam;
@@ -111,35 +116,40 @@ export class TeamService implements ITeamService {
     });
     if (checkExistMember)
       throw new Error(
-        "This member do not in this team or Team's Id do not exist",
+        "This member do not in this team or Team's Id do not exist"
       );
 
     await await Team.findOneAndUpdate(
       { _id: teamId },
-      { $pull: { members: empId } },
+      { $pull: { members: empId } }
     );
 
     const updateTeam: ITeam | null = await Team.findOne(
       {
         _id: teamId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
 
     return updateTeam;
   }
 
   async getTeamByMember(empId: string): Promise<Array<ITeam> | null> {
-    const listMember: Array<ITeam> | null = await Team.find({
-      members: { $elemMatch: { _id: new Types.ObjectId(empId) } },
-    });
-    if (!listMember) return null;
-    return listMember;
+    const listTeam: Array<ITeam> | null = await Team.find({
+      members: {
+        $elemMatch: { _id: new Types.ObjectId(empId) },
+        isDeleted: false,
+      },
+    }).select("-members -leaderID");
+    if (!listTeam) return null;
+    return listTeam;
   }
+
   async getTeamByLeader(empId: string): Promise<Array<ITeam> | null> {
     const listMember: Array<ITeam> | null = await Team.find({
       leaderID: new Types.ObjectId(empId),
-    });
+      isDeleted: false,
+    }).select("-members -leaderID");
     if (!listMember) return null;
     return listMember;
   }

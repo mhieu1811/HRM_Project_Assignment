@@ -12,9 +12,6 @@ import { Response, Request } from "express";
 import { TYPES } from "../util/inversify_config/types";
 import { ITeamService } from "../interfaces/team/ITeamService.interface";
 import { ITeam } from "../interfaces/team/ITeam.interface";
-import { getErrorMessage } from "../util/util_function";
-import logger from "../util/logger";
-import { IEmployee } from "../interfaces/employee/IEmployee.interface";
 import { IEmployeeService } from "../interfaces/employee/IEmployeeService.interface";
 import container from "../util/inversify_config/inversify.config";
 import * as express from "express";
@@ -26,7 +23,7 @@ export default class TeamsController {
 
   constructor(
     @inject(TYPES.Employee) employeeService: IEmployeeService,
-    @inject(TYPES.Team) teamService: ITeamService,
+    @inject(TYPES.Team) teamService: ITeamService
   ) {
     this._teamService = teamService;
     this._employeeService = employeeService;
@@ -35,13 +32,13 @@ export default class TeamsController {
   @httpPost(
     "/",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin"),
+    container.get<express.RequestHandler>("isAdmin")
   )
   async addTeam(request: Request, response: Response) {
     try {
       const team: ITeam = request.body;
       const empIsLeader: boolean = await this._employeeService.empIsLeader(
-        team.leaderID.toString(),
+        team.leaderID.toString()
       );
       if (!empIsLeader) throw new Error("Employee not a leader");
 
@@ -56,7 +53,7 @@ export default class TeamsController {
   @httpPost(
     "/assignMember",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin"),
+    container.get<express.RequestHandler>("isAdmin")
   )
   async assignMember(request: Request, response: Response) {
     try {
@@ -77,7 +74,7 @@ export default class TeamsController {
   @httpPost(
     "/deleteMember",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin"),
+    container.get<express.RequestHandler>("isAdmin")
   )
   async deleteMember(request: Request, response: Response) {
     try {
@@ -98,7 +95,7 @@ export default class TeamsController {
   @httpPost(
     "/assignLeader",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin"),
+    container.get<express.RequestHandler>("isAdmin")
   )
   async assignLeader(request: Request, response: Response) {
     try {
@@ -107,7 +104,7 @@ export default class TeamsController {
 
       const leaderID: string = request.body.leaderID;
       const teamID: string = request.body.teamID;
-      console.log("A");
+
       await this._teamService.assignTeamLeader(leaderID, teamID);
 
       return response.status(204).json();
@@ -119,7 +116,7 @@ export default class TeamsController {
   @httpGet(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader"),
+    container.get<express.RequestHandler>("isLeader")
   )
   async getTeam(request: Request, response: Response) {
     try {
@@ -137,7 +134,7 @@ export default class TeamsController {
   @httpPut(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin"),
+    container.get<express.RequestHandler>("isAdmin")
   )
   async updateTeam(request: Request, response: Response) {
     try {
@@ -153,7 +150,7 @@ export default class TeamsController {
   @httpDelete(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin"),
+    container.get<express.RequestHandler>("isAdmin")
   )
   async deleteTeam(request: Request, response: Response) {
     try {
@@ -164,6 +161,17 @@ export default class TeamsController {
       return response.status(204).json();
     } catch (error) {
       throw error;
+    }
+  }
+
+  @httpGet("/")
+  async getListTeam(request: Request, response: Response) {
+    try {
+      const listTeam: Array<ITeam> | null =
+        await this._teamService.getTeamList();
+      return response.status(200).json({ data: listTeam });
+    } catch (err) {
+      throw err;
     }
   }
 }

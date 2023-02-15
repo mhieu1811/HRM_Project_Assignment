@@ -1,13 +1,6 @@
 import "reflect-metadata";
 import { inject } from "inversify";
-import {
-  controller,
-  httpPost,
-  httpGet,
-  httpPut,
-  httpDelete,
-  TYPE,
-} from "inversify-express-utils";
+import { controller, httpPost, httpGet } from "inversify-express-utils";
 import { Response, Request } from "express";
 import { TYPES } from "../util/inversify_config/types";
 import * as express from "express";
@@ -16,13 +9,10 @@ import { UserService } from "../services/user.service";
 import { IUser } from "../interfaces/user/IUser.interface";
 import container from "../util/inversify_config/inversify.config";
 import { IEmployeeService } from "../interfaces/employee/IEmployeeService.interface";
-import { Types } from "mongoose";
 import { IEmployee } from "../interfaces/employee/IEmployee.interface";
 import { IListTeam } from "../interfaces/team/IListTeam.interface";
 import { ITeamService } from "../interfaces/team/ITeamService.interface";
-import { ITeam } from "../interfaces/team/ITeam.interface";
-
-// import logger from "../util/logger";
+import { IReturnEmployee } from "../interfaces/employee/IReturnEmployee.interface";
 
 @controller("/user")
 export default class UserController {
@@ -33,7 +23,7 @@ export default class UserController {
   constructor(
     @inject(TYPES.User) userService: UserService,
     @inject(TYPES.Employee) employeeService: IEmployeeService,
-    @inject(TYPES.Team) teamService: ITeamService,
+    @inject(TYPES.Team) teamService: ITeamService
   ) {
     this._userService = userService;
     this._employeeService = employeeService;
@@ -58,7 +48,9 @@ export default class UserController {
       const userId = request.body["loginUser"]["id"];
       const role = request.body["loginUser"]["role"];
 
-      const personal: IEmployee = await this._employeeService.getEmp(userId);
+      const personal: IReturnEmployee = await this._employeeService.getEmp(
+        userId
+      );
       let team: Array<IListTeam> | null = null;
 
       if (role === "Leader") {
