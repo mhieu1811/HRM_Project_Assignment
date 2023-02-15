@@ -14,6 +14,7 @@ import { ITeamService } from "../interfaces/team/ITeamService.interface";
 import { IReturnEmployee } from "../interfaces/employee/IReturnEmployee.interface";
 import NotFoundError from "../util/appErrors/errors/notFound.error";
 import { ITeam } from "../interfaces/team/ITeam.interface";
+import { loginReturnValue } from "../interfaces/user/loginReturnValue.interface";
 
 @controller("/user")
 export default class UserController {
@@ -24,7 +25,7 @@ export default class UserController {
   constructor(
     @inject(TYPES.User) userService: UserService,
     @inject(TYPES.Employee) employeeService: IEmployeeService,
-    @inject(TYPES.Team) teamService: ITeamService
+    @inject(TYPES.Team) teamService: ITeamService,
   ) {
     this._userService = userService;
     this._employeeService = employeeService;
@@ -35,9 +36,11 @@ export default class UserController {
   async login(request: Request, response: Response) {
     try {
       const loginUser: IUser = request.body;
-      const token: string = await this._userService.login(loginUser);
+      const data: loginReturnValue = await this._userService.login(loginUser);
 
-      return response.status(200).json({ token: token });
+      return response
+        .status(200)
+        .json({ token: data.token, email: data.email, name: data.name });
     } catch (error) {
       throw error;
     }
@@ -50,7 +53,7 @@ export default class UserController {
       const role = request.body["loginUser"]["role"];
 
       const personal: IReturnEmployee = await this._employeeService.getEmp(
-        userId
+        userId,
       );
 
       let team: Array<IListTeam> | null = null;
@@ -62,12 +65,12 @@ export default class UserController {
       }
 
       return response.status(200).json({
-        data: {
+        employee: {
           email: personal.email,
           name: personal.name,
           role: personal.role,
-          team: team,
         },
+        team: team,
       });
     } catch (error) {
       throw error;
@@ -82,14 +85,14 @@ export default class UserController {
       if (!teamId) throw new NotFoundError("Params 'id' ");
       const isMemberInTeam: boolean = await this._teamService.isMemberInTeam(
         teamId,
-        userId
+        userId,
       );
       if (!isMemberInTeam) throw new Error("This member not in this team");
 
       const team: ITeam = await this._teamService.getTeam(teamId);
 
       return response.status(200).json({
-        team: team,
+        team,
       });
     } catch (error) {
       throw error;

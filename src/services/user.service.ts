@@ -6,18 +6,20 @@ import Employee from "../models/employee.model";
 import { IUserService } from "../interfaces/user/IUserService.interface";
 import UnAuthorize from "../util/appErrors/errors/unauthorize.error";
 import { IJwtFormat } from "../interfaces/user/JWT.interface";
+import { loginReturnValue } from "../interfaces/user/loginReturnValue.interface";
+import NotFoundError from "../util/appErrors/errors/notFound.error";
 
 @injectable()
 export class UserService implements IUserService {
-  async login(user: IUser): Promise<string> {
-    if (!user.email) throw new Error("missing email");
+  async login(user: IUser): Promise<loginReturnValue> {
+    if (!user.email) throw new NotFoundError(" email");
     const userLogin = await Employee.findOne({ email: user["email"] });
 
     if (!userLogin) throw new UnAuthorize("Wrong email or password");
 
     const passwordIsvalid = bcrypt.compareSync(
       user.password,
-      userLogin.password
+      userLogin.password,
     );
 
     if (!passwordIsvalid) throw new UnAuthorize("Wrong email or password");
@@ -29,7 +31,11 @@ export class UserService implements IUserService {
     const token = jwt.sign(data, "hieulaiminh", {
       expiresIn: 1600, // 1 hours
     });
-
-    return token;
+    const returnData: loginReturnValue = {
+      token: token,
+      name: userLogin.name,
+      email: userLogin.email,
+    };
+    return returnData;
   }
 }
