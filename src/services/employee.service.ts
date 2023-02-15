@@ -53,12 +53,10 @@ export class EmployeeService implements IEmployeeService {
   }
 
   async getEmp(employeeId: string): Promise<IReturnEmployee> {
-    const currentEmp: IReturnEmployee | null = await Employee.findOne(
-      {
-        _id: employeeId,
-      },
-      { isDeleted: false }
-    ).select("-password -isDeleted");
+    const currentEmp: IReturnEmployee | null = await Employee.findOne({
+      _id: employeeId,
+      isDeleted: false,
+    }).select("-password -isDeleted");
 
     if (!currentEmp) {
       throw new NotFoundError("Not found Employee!");
@@ -97,7 +95,6 @@ export class EmployeeService implements IEmployeeService {
     );
 
     if (!currentEmp) throw new NotFoundError("Employee do not exist");
-    console.log(currentEmp);
     if (currentEmp.role === "Member") return true;
 
     return false;

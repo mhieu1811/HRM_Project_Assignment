@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { IEmployee } from "../interfaces/employee/IEmployee.interface";
 import Employee from "../models/employee.model";
+import Team from "../models/team.model";
 import InternalServerError from "../util/appErrors/errors/internalServer.error";
 import UnAuthorize from "../util/appErrors/errors/unauthorize.error";
 import logger from "../util/logger";
@@ -9,7 +10,7 @@ import logger from "../util/logger";
 export function isLogin(
   request: Request,
   response: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   try {
     const tokenString = request.header("Authorization");
@@ -23,7 +24,6 @@ export function isLogin(
         return response.status(401).send({ message: err });
       }
       request.body["loginUser"] = decoded;
-      console.log("A");
       next();
     });
   } catch (error) {
@@ -34,7 +34,7 @@ export function isLogin(
 export function isAdmin(
   request: Request,
   response: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   try {
     Employee.findById(request.body["loginUser"]["id"]).exec(
@@ -51,7 +51,7 @@ export function isAdmin(
           return;
         }
         next(new UnAuthorize("UnAuthorized"));
-      },
+      }
     );
   } catch (error) {
     next(error);
@@ -61,7 +61,7 @@ export function isAdmin(
 export function isLeader(
   request: Request,
   response: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   try {
     Employee.findById(request.body["loginUser"]["id"]).exec(
@@ -75,15 +75,15 @@ export function isLeader(
           return;
         }
         const role = employee.role;
-        console.log(role);
+
         if (role === "Admin" || role === "Leader") {
           request.body["loginUser"]["role"] = role;
           next();
           return;
         }
-        // case sai sẽ sai
+
         next(new UnAuthorize("UnAuthorized"));
-      },
+      }
     );
   } catch (error) {
     next(error);
