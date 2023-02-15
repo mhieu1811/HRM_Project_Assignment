@@ -9,10 +9,11 @@ import { UserService } from "../services/user.service";
 import { IUser } from "../interfaces/user/IUser.interface";
 import container from "../util/inversify_config/inversify.config";
 import { IEmployeeService } from "../interfaces/employee/IEmployeeService.interface";
-import { IEmployee } from "../interfaces/employee/IEmployee.interface";
 import { IListTeam } from "../interfaces/team/IListTeam.interface";
 import { ITeamService } from "../interfaces/team/ITeamService.interface";
 import { IReturnEmployee } from "../interfaces/employee/IReturnEmployee.interface";
+import NotFoundError from "../util/appErrors/errors/notFound.error";
+import { ITeam } from "../interfaces/team/ITeam.interface";
 
 @controller("/user")
 export default class UserController {
@@ -51,6 +52,7 @@ export default class UserController {
       const personal: IReturnEmployee = await this._employeeService.getEmp(
         userId
       );
+
       let team: Array<IListTeam> | null = null;
 
       if (role === "Leader") {
@@ -66,6 +68,28 @@ export default class UserController {
           role: personal.role,
           team: team,
         },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @httpGet("/team/:id", container.get<express.RequestHandler>("isLogin"))
+  async getTeamDetails(request: Request, response: Response) {
+    try {
+      const userId = request.body["loginUser"]["id"];
+      const teamId: string = request.params["id"];
+      if (!teamId) throw new NotFoundError("Params 'id' ");
+      const isMemberInTeam: boolean = await this._teamService.isMemberInTeam(
+        teamId,
+        userId
+      );
+      if (!isMemberInTeam) throw new Error("This member not in this team");
+
+      const team: ITeam = await this._teamService.getTeam(teamId);
+
+      return response.status(200).json({
+        team: team,
       });
     } catch (error) {
       throw error;

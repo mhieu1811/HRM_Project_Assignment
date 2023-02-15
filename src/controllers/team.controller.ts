@@ -53,7 +53,7 @@ export default class TeamsController {
   @httpPost(
     "/assignMember",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin")
+    container.get<express.RequestHandler>("isLeader")
   )
   async assignMember(request: Request, response: Response) {
     try {
