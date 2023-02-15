@@ -12,6 +12,7 @@ import "./controllers/user.controller";
 import { Request, Response, NextFunction } from "express";
 import logger from "./util/logger";
 import BaseError from "./util/appErrors/base.error";
+import cors from "cors";
 env.config();
 
 export class App {
@@ -70,7 +71,7 @@ export class App {
     //   logger.error(error.message);
     //   response.status(500).send({ message: error.message });
     // });
-
+    this.server.use(cors());
     this.server.use(json());
     this.server.use(bodyParser.json());
     this.server.use(express.json());
