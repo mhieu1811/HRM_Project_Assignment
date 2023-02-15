@@ -1,5 +1,4 @@
 import { IEmployee } from "./IEmployee.interface";
-import { ISearch, IPaginate } from "../../util/query.interface";
 import { IReturnEmployee } from "./IReturnEmployee.interface";
 export interface IEmployeeService {
   addEmp(employee: IEmployee): Promise<IEmployee>;

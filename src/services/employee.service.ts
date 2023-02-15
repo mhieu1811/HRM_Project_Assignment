@@ -2,12 +2,8 @@ import { injectable } from "inversify";
 import { IEmployee } from "../interfaces/employee/IEmployee.interface";
 import { IEmployeeService } from "../interfaces/employee/IEmployeeService.interface";
 import { IReturnEmployee } from "../interfaces/employee/IReturnEmployee.interface";
-import { ITeam } from "../interfaces/team/ITeam.interface";
 import Employee from "../models/employee.model";
-import Team from "../models/team.model";
 import NotFoundError from "../util/appErrors/errors/notFound.error";
-import { ISearch, IPaginate } from "../util/query.interface";
-import { role } from "../util/role.enum";
 import bcrypt from "bcryptjs";
 
 @injectable()

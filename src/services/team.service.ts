@@ -5,7 +5,6 @@ import { ITeamService } from "../interfaces/team/ITeamService.interface";
 import Employee from "../models/employee.model";
 import Team from "../models/team.model";
 import NotFoundError from "../util/appErrors/errors/notFound.error";
-import { role } from "../util/role.enum";
 import { Types } from "mongoose";
 
 @injectable()

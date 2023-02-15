@@ -16,7 +16,6 @@ import { generatePassword, uniqeEmail } from "../util/util_function";
 import logger from "../util/logger";
 import container from "../util/inversify_config/inversify.config";
 import UnAuthorize from "../util/appErrors/errors/unauthorize.error";
-import { Types } from "mongoose";
 import { ITeamService } from "../interfaces/team/ITeamService.interface";
 import NotFoundError from "../util/appErrors/errors/notFound.error";
 import { IListTeam } from "../interfaces/team/IListTeam.interface";

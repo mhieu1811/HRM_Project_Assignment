@@ -1,11 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { IEmployee } from "../interfaces/employee/IEmployee.interface";
 import Employee from "../models/employee.model";
-import Team from "../models/team.model";
 import InternalServerError from "../util/appErrors/errors/internalServer.error";
 import UnAuthorize from "../util/appErrors/errors/unauthorize.error";
-import logger from "../util/logger";
 
 export function isLogin(
   request: Request,
