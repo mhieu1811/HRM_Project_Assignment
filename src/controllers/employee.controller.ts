@@ -12,23 +12,27 @@ import { Response, Request } from "express";
 import { TYPES } from "../util/inversify_config/types";
 import { IEmployeeService } from "../interfaces/employee/IEmployeeService.interface";
 import { IEmployee } from "../interfaces/employee/IEmployee.interface";
-import {
-  generatePassword,
-  getErrorMessage,
-  uniqeEmail,
-} from "../util/util_function";
+import { generatePassword, uniqeEmail } from "../util/util_function";
 import logger from "../util/logger";
 import container from "../util/inversify_config/inversify.config";
 import UnAuthorize from "../util/appErrors/errors/unauthorize.error";
-
-// import logger from "../util/logger";
+import { Types } from "mongoose";
+import { ITeamService } from "../interfaces/team/ITeamService.interface";
+import NotFoundError from "../util/appErrors/errors/notFound.error";
+import { IListTeam } from "../interfaces/team/IListTeam.interface";
+import { IReturnEmployee } from "../interfaces/employee/IReturnEmployee.interface";
 
 @controller("/employees")
 export default class EmployeeController {
   private _employeeService: IEmployeeService;
+  private _teamService: ITeamService;
 
-  constructor(@inject(TYPES.Employee) employeeService: IEmployeeService) {
+  constructor(
+    @inject(TYPES.Employee) employeeService: IEmployeeService,
+    @inject(TYPES.Team) teamService: ITeamService
+  ) {
     this._employeeService = employeeService;
+    this._teamService = teamService;
   }
 
   @httpPost(
@@ -73,14 +77,20 @@ export default class EmployeeController {
   async getEmployee(request: Request, response: Response) {
     try {
       const id = request.params.id;
-      const employee = await this._employeeService.getEmp(id);
+      const employee: IReturnEmployee = await this._employeeService.getEmp(id);
 
-      if (employee === null) return response.status(404);
+      if (!employee) throw new NotFoundError("Employee not found");
 
-      response.status(200).json(employee);
+      let team: Array<IListTeam> | null = null;
+      const role = employee.role;
+      if (role === "Leader") {
+        team = await this._teamService.getTeamByLeader(id);
+      } else if (role === "Member") {
+        team = await this._teamService.getTeamByMember(id);
+      }
+
+      return response.status(200).json({ employee: employee, team: team });
     } catch (error) {
-      // const message: string = getErrorMessage(error);
-      // logger.error(message);
       throw error;
     }
   }
@@ -97,11 +107,12 @@ export default class EmployeeController {
 
       await this._employeeService.updateEmp(emp, empId);
 
-      response.status(204);
+      return response.status(204).json();
     } catch (error) {
       throw error;
     }
   }
+
   @httpDelete(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
@@ -113,7 +124,22 @@ export default class EmployeeController {
 
       await this._employeeService.deleteEmp(empId);
 
-      response.status(204);
+      return response.status(204).json();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @httpGet(
+    "/",
+    container.get<express.RequestHandler>("isLogin"),
+    container.get<express.RequestHandler>("isLeader")
+  )
+  async getListEmployee(request: Request, response: Response) {
+    try {
+      const employeeList: Array<IReturnEmployee> | null =
+        await this._employeeService.getEmpList();
+      return response.status(200).json({ data: employeeList });
     } catch (error) {
       throw error;
     }
