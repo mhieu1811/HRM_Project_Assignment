@@ -1,12 +1,14 @@
 import { injectable } from "inversify";
 import { IEmployee } from "../interfaces/employee/IEmployee.interface";
 import { IEmployeeService } from "../interfaces/employee/IEmployeeService.interface";
+import { IReturnEmployee } from "../interfaces/employee/IReturnEmployee.interface";
 import { ITeam } from "../interfaces/team/ITeam.interface";
 import Employee from "../models/employee.model";
 import Team from "../models/team.model";
 import NotFoundError from "../util/appErrors/errors/notFound.error";
 import { ISearch, IPaginate } from "../util/query.interface";
 import { role } from "../util/role.enum";
+import bcrypt from "bcryptjs";
 
 @injectable()
 export class EmployeeService implements IEmployeeService {
@@ -18,41 +20,45 @@ export class EmployeeService implements IEmployeeService {
 
   async updateEmp(
     employee: IEmployee,
-    employeeId: string,
-  ): Promise<IEmployee | null> {
+    employeeId: string
+  ): Promise<IReturnEmployee | null> {
     await this.getEmp(employeeId);
+    if (employee.password) {
+      const password = bcrypt.hashSync(employee.password, 10);
+      employee.password = password;
+    }
     await Employee.findOneAndUpdate({ _id: employeeId }, employee);
-    const updateEmp: IEmployee | null = await await Employee.findOne(
+    const updateEmp: IReturnEmployee | null = await await Employee.findOne(
       {
         _id: employeeId,
       },
-      { isDeleted: false },
-    );
+      { isDeleted: false }
+    ).select("-password -isDeleted");
     return updateEmp;
   }
 
-  async deleteEmp(employeeId: string): Promise<IEmployee | null> {
+  async deleteEmp(employeeId: string): Promise<IReturnEmployee | null> {
     await this.getEmp(employeeId);
     await Employee.findOneAndUpdate(
       { _id: employeeId },
-      { isDeleted: true },
+      { isDeleted: true }
     ).exec();
-    const updateEmp: IEmployee | null = await await Employee.findOne(
+    const updateEmp: IReturnEmployee | null = await await Employee.findOne(
       {
         _id: employeeId,
       },
-      { isDeleted: false },
-    );
+      { isDeleted: false }
+    ).select("-password -isDeleted");
     return updateEmp;
   }
 
-  async getEmp(employeeId: string): Promise<IEmployee> {
-    const currentEmp: IEmployee | null = await Employee.findOne(
+  async getEmp(employeeId: string): Promise<IReturnEmployee> {
+    const currentEmp: IReturnEmployee | null = await Employee.findOne(
       {
         _id: employeeId,
       },
-      { isDeleted: false },
-    );
+      { isDeleted: false }
+    ).select("-password -isDeleted");
 
     if (!currentEmp) {
       throw new NotFoundError("Not found Employee!");
@@ -60,8 +66,12 @@ export class EmployeeService implements IEmployeeService {
 
     return currentEmp;
   }
-  getEmpList(optionsMatch: ISearch, paginateParams: IPaginate): void {
-    console.log("A");
+
+  async getEmpList(): Promise<Array<IReturnEmployee> | null> {
+    const listEmp: Array<IReturnEmployee> | null = await Employee.find({
+      isDeleted: false,
+    }).select("-password -isDeleted");
+    return listEmp;
   }
 
   async empIsLeader(empId: string): Promise<boolean> {
@@ -69,7 +79,7 @@ export class EmployeeService implements IEmployeeService {
       {
         _id: empId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
 
     if (!currentEmp) throw new NotFoundError("Employee do not exist");
@@ -77,12 +87,13 @@ export class EmployeeService implements IEmployeeService {
 
     return false;
   }
+
   async empIsMember(empId: string): Promise<boolean> {
     const currentEmp: IEmployee | null = await Employee.findOne(
       {
         _id: empId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
 
     if (!currentEmp) throw new NotFoundError("Employee do not exist");
