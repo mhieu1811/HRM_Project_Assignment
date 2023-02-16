@@ -164,7 +164,11 @@ export default class TeamsController {
     }
   }
 
-  @httpGet("/")
+  @httpGet(
+    "/",
+    container.get<express.RequestHandler>("isLogin"),
+    container.get<express.RequestHandler>("isLeader")
+  )
   async getListTeam(request: Request, response: Response) {
     try {
       const listTeam: Array<ITeam> | null =
