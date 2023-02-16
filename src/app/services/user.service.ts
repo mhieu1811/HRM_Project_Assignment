@@ -41,6 +41,7 @@ export class UserService {
         `Bearer ${this.cookieService.get('userToken')}`
       ),
     };
+
     return this.http.get<ITeam>(
       environment.api_url + '/user/team/' + teamId,
       header
