@@ -23,7 +23,7 @@ export default class TeamsController {
 
   constructor(
     @inject(TYPES.Employee) employeeService: IEmployeeService,
-    @inject(TYPES.Team) teamService: ITeamService
+    @inject(TYPES.Team) teamService: ITeamService,
   ) {
     this._teamService = teamService;
     this._employeeService = employeeService;
@@ -32,19 +32,19 @@ export default class TeamsController {
   @httpPost(
     "/",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin")
+    container.get<express.RequestHandler>("isAdmin"),
   )
   async addTeam(request: Request, response: Response) {
     try {
       const team: ITeam = request.body;
       const empIsLeader: boolean = await this._employeeService.empIsLeader(
-        team.leaderID.toString()
+        team.leaderID.toString(),
       );
       if (!empIsLeader) throw new Error("Employee not a leader");
 
       const newTeam = await this._teamService.addTeam(team);
 
-      return response.status(200).json({ message: newTeam });
+      return response.status(200).json({ newTeam });
     } catch (error) {
       throw error;
     }
@@ -53,7 +53,7 @@ export default class TeamsController {
   @httpPost(
     "/assignMember",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async assignMember(request: Request, response: Response) {
     try {
@@ -74,7 +74,7 @@ export default class TeamsController {
   @httpPost(
     "/deleteMember",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async deleteMember(request: Request, response: Response) {
     try {
@@ -95,7 +95,7 @@ export default class TeamsController {
   @httpPost(
     "/assignLeader",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin")
+    container.get<express.RequestHandler>("isAdmin"),
   )
   async assignLeader(request: Request, response: Response) {
     try {
@@ -116,7 +116,7 @@ export default class TeamsController {
   @httpGet(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async getTeam(request: Request, response: Response) {
     try {
@@ -134,7 +134,7 @@ export default class TeamsController {
   @httpPut(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin")
+    container.get<express.RequestHandler>("isAdmin"),
   )
   async updateTeam(request: Request, response: Response) {
     try {
@@ -150,7 +150,7 @@ export default class TeamsController {
   @httpDelete(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin")
+    container.get<express.RequestHandler>("isAdmin"),
   )
   async deleteTeam(request: Request, response: Response) {
     try {
@@ -173,7 +173,7 @@ export default class TeamsController {
     try {
       const listTeam: Array<ITeam> | null =
         await this._teamService.getTeamList();
-      return response.status(200).json({ data: listTeam });
+      return response.status(200).json({ listTeam });
     } catch (err) {
       throw err;
     }
