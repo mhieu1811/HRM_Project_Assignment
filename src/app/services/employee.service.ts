@@ -22,7 +22,7 @@ export class EmployeeService {
     };
 
     return this.http.get<Array<IEmployee>>(
-      environment.api_url + '/employees/',
+      environment.api_url + '/employees?role=' + role,
       header
     );
   }
@@ -81,7 +81,7 @@ export class EmployeeService {
 
     return this.http.put<IMessage>(
       environment.api_url + '/employees/' + employeeID,
-      employee,
+      { employee: employee },
       header
     );
   }

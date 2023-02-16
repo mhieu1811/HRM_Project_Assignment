@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
+import { IListTeam } from '../interfaces/IListTeam.interface';
 import { IMessage } from '../interfaces/IMessage.interface';
 import { ITeam } from '../interfaces/ITeam.interface';
 
@@ -12,7 +13,7 @@ import { ITeam } from '../interfaces/ITeam.interface';
 export class TeamService {
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
-  getListTeam(): Observable<Array<ITeam>> {
+  getListTeam(): Observable<Array<IListTeam>> {
     const header = {
       headers: new HttpHeaders().set(
         'Authorization',
@@ -20,7 +21,10 @@ export class TeamService {
       ),
     };
 
-    return this.http.get<Array<ITeam>>(environment.api_url + '/teams/', header);
+    return this.http.get<Array<IListTeam>>(
+      environment.api_url + '/teams/',
+      header
+    );
   }
 
   getTeamDetails(teamId: string): Observable<ITeam> {
@@ -58,7 +62,7 @@ export class TeamService {
 
     return this.http.put<ITeam>(
       environment.api_url + '/teams/' + teamID,
-      team,
+      { team: team },
       header
     );
   }

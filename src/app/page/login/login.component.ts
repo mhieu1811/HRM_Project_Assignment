@@ -65,6 +65,10 @@ export class LoginComponent implements OnInit {
     this.userService.login(email, password).subscribe(
       (res: loginReturnValue) => {
         this.cookieService.set('userToken', res.token, 0.25);
+        this.cookieService.set('role', res.role, 0.25);
+        this.cookieService.set('name', res.name, 0.25);
+        this.cookieService.set('email', res.email, 0.25);
+
         this.router.navigate(['/']);
       },
       (err: HttpErrorResponse) => {

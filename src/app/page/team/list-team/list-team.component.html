@@ -1,0 +1,9 @@
+<ul>
+  <li *ngFor="let team of listTeam; let i = index">
+    {{ team.teamName }}
+    {{ team.leaderID!.name }}
+    <button (click)="editTeam(team._id)">Edit</button>
+
+    <button (click)="deleteTeam(team._id, i)">Delete</button>
+  </li>
+</ul>

@@ -1,0 +1,9 @@
+{{ information.employee.name }}
+{{ information.employee.email }}
+{{ information.employee.role }}
+
+<ul>
+  <li *ngFor="let team of information.team">
+    {{ team.teamName }}
+  </li>
+</ul>

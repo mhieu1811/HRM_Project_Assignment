@@ -1,0 +1,21 @@
+<div class="text-center heading">
+  <h2 class="mb-2">edit employee</h2>
+</div>
+<p style="color: red">{{ message }}</p>
+<form [formGroup]="editForm" (ngSubmit)="editTeam()">
+  <div class="form-group">
+    <label for="name"> Team Name </label>
+    <input
+      id="name"
+      class=""
+      type="text"
+      formControlName="name"
+      [ngClass]="f['name'].errors"
+    />
+    <div *ngIf="f['name'].errors && f['name'].dirty" class="is-invalid">
+      <div *ngIf="f['name'].errors['required']">Team Name is required</div>
+    </div>
+  </div>
+
+  <input type="submit" value="Submit" class="btn btn-main mt-3 btn-block" />
+</form>

@@ -1,7 +1,8 @@
 import { IEmployee } from './IEmployee.interface';
 
-export interface ITeam {
+export interface IListTeam {
+  _id: string;
   teamName: string;
-  leaderID?: string;
+  leaderID?: IEmployee;
   members?: Array<IEmployee>;
 }
