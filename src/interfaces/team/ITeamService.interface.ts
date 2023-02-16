@@ -2,6 +2,7 @@ import { ITeam } from "./ITeam.interface";
 
 export interface ITeamService {
   addTeam(team: ITeam): Promise<ITeam | null>;
+  deleteTeam(teamId: string): Promise<ITeam | null>;
   updateTeam(team: ITeam, teamId: string): Promise<ITeam | null>;
   getTeam(teamId: string): Promise<ITeam>;
   getTeamList(): Promise<Array<ITeam> | null>;

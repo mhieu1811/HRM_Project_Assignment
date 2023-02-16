@@ -21,10 +21,10 @@ export class EmployeeService implements IEmployeeService {
     employeeId: string
   ): Promise<IReturnEmployee | null> {
     await this.getEmp(employeeId);
-    if (employee.password) {
-      const password = bcrypt.hashSync(employee.password, 10);
-      employee.password = password;
-    }
+    // if (employee.password) {
+    //   const password = bcrypt.hashSync(employee.password, 10);
+    //   employee.password = password;
+    // }
     await Employee.findOneAndUpdate({ _id: employeeId }, employee);
     const updateEmp: IReturnEmployee | null = await await Employee.findOne(
       {
@@ -32,6 +32,7 @@ export class EmployeeService implements IEmployeeService {
       },
       { isDeleted: false }
     ).select("-password -isDeleted");
+
     return updateEmp;
   }
 
@@ -46,6 +47,7 @@ export class EmployeeService implements IEmployeeService {
     await Team.where("_id")
       .in([teamAssigned])
       .updateMany({ $pull: { members: employeeId } });
+
     const deleteEmp: IReturnEmployee | null = await await Employee.findOne(
       {
         _id: employeeId,
@@ -68,10 +70,25 @@ export class EmployeeService implements IEmployeeService {
     return currentEmp;
   }
 
-  async getEmpList(): Promise<Array<IReturnEmployee> | null> {
-    const listEmp: Array<IReturnEmployee> | null = await Employee.find({
-      isDeleted: false,
-    }).select("-password -isDeleted");
+  async getEmpList(role?: string): Promise<Array<IReturnEmployee> | null> {
+    let condition = {};
+    switch (role) {
+      case "Member":
+        condition = { isDeleted: false, role: "Member" };
+        break;
+      case "Leader":
+        condition = { isDeleted: false, role: "Leader" };
+        break;
+      case "Admin":
+        condition = { isDeleted: false };
+        break;
+      default:
+        condition = { isDeleted: false, role: { $ne: "Admin" } };
+        break;
+    }
+    const listEmp: Array<IReturnEmployee> | null = await Employee.find(
+      condition
+    ).select("-password -isDeleted ");
     return listEmp;
   }
 

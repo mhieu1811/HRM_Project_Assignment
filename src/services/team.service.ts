@@ -6,6 +6,9 @@ import Employee from "../models/employee.model";
 import Team from "../models/team.model";
 import NotFoundError from "../util/appErrors/errors/notFound.error";
 import { Types } from "mongoose";
+import { IReturnEmployee } from "../interfaces/employee/IReturnEmployee.interface";
+import { IReturnTeam } from "../interfaces/team/IReturnTeam.interface";
+import logger from "../util/logger";
 
 @injectable()
 export class TeamService implements ITeamService {
@@ -17,18 +20,35 @@ export class TeamService implements ITeamService {
 
   async updateTeam(team: ITeam, teamId: string): Promise<ITeam | null> {
     await this.getTeam(teamId);
+    console.log(team);
     await Team.updateOne({ _id: teamId }, team);
     const updateEmp: ITeam | null = await Team.findById(teamId);
     return updateEmp;
   }
 
+  async deleteTeam(teamId: string): Promise<ITeam | null> {
+    await this.getTeam(teamId);
+    await Team.updateOne({ _id: teamId }, { isDeleted: true });
+    const deleteEmp: ITeam | null = await Team.findById(teamId);
+    return deleteEmp;
+  }
+
   async getTeam(teamId: string): Promise<ITeam> {
-    const currentTeam: ITeam | null = await Team.findById(teamId)
-      .populate({ path: "leaderID", select: "-password -_id -role -isDeleted" })
-      .populate({ path: "members", select: "-password -_id -role -isDeleted" });
+    const currentTeam: ITeam | null = await Team.findOne({
+      _id: teamId,
+      isDeleted: false,
+    })
+      .populate({
+        path: "leaderID",
+        select: "-password -_id -role -isDeleted -team",
+      })
+      .populate({
+        path: "members",
+        select: "-password -_id -role -isDeleted -team",
+      });
 
     if (!currentTeam) {
-      throw new Error("Not found Employee!");
+      throw new NotFoundError("Employee!");
     }
     return currentTeam;
   }
@@ -36,7 +56,12 @@ export class TeamService implements ITeamService {
   async getTeamList(): Promise<Array<ITeam> | null> {
     const listTeam: Array<ITeam> | null = await Team.find({
       isDeleted: false,
-    }).select("-members -leaderID");
+    })
+      .select("-members ")
+      .populate({
+        path: "leaderID",
+        select: "-password -_id -role -isDeleted -team",
+      });
     return listTeam;
   }
 
@@ -45,7 +70,7 @@ export class TeamService implements ITeamService {
       {
         _id: teamId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
     if (!currentTeam) throw new NotFoundError("Team");
 
@@ -61,20 +86,20 @@ export class TeamService implements ITeamService {
       {
         _id: empId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
     if (!currentEmp) throw new NotFoundError("Employee");
 
     await await Team.findOneAndUpdate(
       { _id: teamId },
-      { $push: { members: empId } },
+      { $push: { members: empId } }
     );
 
     const updateTeam: ITeam | null = await Team.findOne(
       {
         _id: teamId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
     return updateTeam;
   }
@@ -84,8 +109,9 @@ export class TeamService implements ITeamService {
       {
         _id: empId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
+    console.log(empId);
     if (!currentEmp) throw new NotFoundError("Employee do not exist");
     if (currentEmp.role !== "Leader") throw new Error("Employee not a leader");
 
@@ -93,7 +119,7 @@ export class TeamService implements ITeamService {
       {
         _id: teamId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
 
     if (!currentTeam) throw new NotFoundError("Team do not exist");
@@ -104,7 +130,7 @@ export class TeamService implements ITeamService {
       {
         _id: teamId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
 
     return updateTeam;
@@ -119,19 +145,19 @@ export class TeamService implements ITeamService {
 
     if (!checkExistMember)
       throw new Error(
-        "This member do not in this team or Team's Id do not exist",
+        "This member do not in this team or Team's Id do not exist"
       );
 
     await await Team.findOneAndUpdate(
       { _id: teamId },
-      { $pull: { members: empId } },
+      { $pull: { members: empId } }
     );
 
     const updateTeam: ITeam | null = await Team.findOne(
       {
         _id: teamId,
       },
-      { isDeleted: false },
+      { isDeleted: false }
     );
 
     return updateTeam;
@@ -163,8 +189,9 @@ export class TeamService implements ITeamService {
     })
       .where("members")
       .in([userId]);
-
+    logger.debug(checkExistMember);
     if (!checkExistMember) return false;
+
     return true;
   }
 }

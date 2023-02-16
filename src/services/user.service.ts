@@ -19,7 +19,7 @@ export class UserService implements IUserService {
 
     const passwordIsvalid = bcrypt.compareSync(
       user.password,
-      userLogin.password,
+      userLogin.password
     );
 
     if (!passwordIsvalid) throw new UnAuthorize("Wrong email or password");
@@ -35,6 +35,7 @@ export class UserService implements IUserService {
       token: token,
       name: userLogin.name,
       email: userLogin.email,
+      role: userLogin.role,
     };
     return returnData;
   }

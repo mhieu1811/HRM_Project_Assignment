@@ -18,7 +18,7 @@ export function isLogin(
     }
     jwt.verify(token, "hieulaiminh", (err, decoded) => {
       if (err || !decoded) {
-        throw err;
+        response.status(401).json(err);
       }
       request.body["loginUser"] = decoded;
       next();
@@ -72,7 +72,7 @@ export function isLeader(
           return;
         }
         const role = employee.role;
-
+        console.log(role);
         if (role === "Admin" || role === "Leader") {
           request.body["loginUser"]["role"] = role;
           next();

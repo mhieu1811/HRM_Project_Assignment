@@ -15,6 +15,8 @@ import { IReturnEmployee } from "../interfaces/employee/IReturnEmployee.interfac
 import NotFoundError from "../util/appErrors/errors/notFound.error";
 import { ITeam } from "../interfaces/team/ITeam.interface";
 import { loginReturnValue } from "../interfaces/user/loginReturnValue.interface";
+import logger from "../util/logger";
+import { role } from "../util/role.enum";
 
 @controller("/user")
 export default class UserController {
@@ -25,7 +27,7 @@ export default class UserController {
   constructor(
     @inject(TYPES.User) userService: UserService,
     @inject(TYPES.Employee) employeeService: IEmployeeService,
-    @inject(TYPES.Team) teamService: ITeamService,
+    @inject(TYPES.Team) teamService: ITeamService
   ) {
     this._userService = userService;
     this._employeeService = employeeService;
@@ -40,7 +42,12 @@ export default class UserController {
 
       return response
         .status(200)
-        .json({ token: data.token, email: data.email, name: data.name });
+        .json({
+          token: data.token,
+          email: data.email,
+          name: data.name,
+          role: data.role,
+        });
     } catch (error) {
       throw error;
     }
@@ -53,7 +60,7 @@ export default class UserController {
       const role = request.body["loginUser"]["role"];
 
       const personal: IReturnEmployee = await this._employeeService.getEmp(
-        userId,
+        userId
       );
 
       let team: Array<IListTeam> | null = null;
@@ -81,13 +88,19 @@ export default class UserController {
   async getTeamDetails(request: Request, response: Response) {
     try {
       const userId = request.body["loginUser"]["id"];
+
       const teamId: string = request.params["id"];
+
       if (!teamId) throw new NotFoundError("Params 'id' ");
-      const isMemberInTeam: boolean = await this._teamService.isMemberInTeam(
-        teamId,
-        userId,
-      );
-      if (!isMemberInTeam) throw new Error("This member not in this team");
+      if (request.body["loginUser"]["role"] === "Member") {
+        logger.debug(teamId);
+        const isMemberInTeam: boolean = await this._teamService.isMemberInTeam(
+          teamId,
+          userId
+        );
+
+        if (!isMemberInTeam) throw new Error("This member not in this team");
+      }
 
       const team: ITeam = await this._teamService.getTeam(teamId);
 

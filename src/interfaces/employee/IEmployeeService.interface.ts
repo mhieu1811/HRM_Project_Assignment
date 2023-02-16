@@ -8,7 +8,7 @@ export interface IEmployeeService {
   ): Promise<IReturnEmployee | null>;
   getEmp(employeeId: string): Promise<IReturnEmployee>;
   deleteEmp(employeeId: string): Promise<IReturnEmployee | null>;
-  getEmpList(): Promise<Array<IReturnEmployee> | null>;
+  getEmpList(role?: string): Promise<Array<IReturnEmployee> | null>;
   empIsLeader(empId: string): Promise<boolean>;
   empIsMember(empId: string): Promise<boolean>;
 }
