@@ -19,7 +19,7 @@ export class UserService implements IUserService {
 
     const passwordIsvalid = bcrypt.compareSync(
       user.password,
-      userLogin.password
+      userLogin.password,
     );
 
     if (!passwordIsvalid) throw new UnAuthorize("Wrong email or password");
@@ -29,7 +29,7 @@ export class UserService implements IUserService {
       id: userLogin._id,
     };
     const token = jwt.sign(data, "hieulaiminh", {
-      expiresIn: 1600, // 1 hours
+      expiresIn: 9600, // 1/4 day
     });
     const returnData: loginReturnValue = {
       token: token,

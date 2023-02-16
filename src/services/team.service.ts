@@ -20,8 +20,9 @@ export class TeamService implements ITeamService {
 
   async updateTeam(team: ITeam, teamId: string): Promise<ITeam | null> {
     await this.getTeam(teamId);
-    console.log(team);
     await Team.updateOne({ _id: teamId }, team);
+    if (team.leaderID)
+      await this.assignTeamLeader(team.leaderID.toString(), teamId);
     const updateEmp: ITeam | null = await Team.findById(teamId);
     return updateEmp;
   }
@@ -40,15 +41,15 @@ export class TeamService implements ITeamService {
     })
       .populate({
         path: "leaderID",
-        select: "-password -_id -role -isDeleted -team",
+        select: "-password  -role -isDeleted -team",
       })
       .populate({
         path: "members",
-        select: "-password -_id -role -isDeleted -team",
+        select: "-password  -isDeleted -team",
       });
 
     if (!currentTeam) {
-      throw new NotFoundError("Employee!");
+      throw new NotFoundError("Team!");
     }
     return currentTeam;
   }
@@ -70,7 +71,7 @@ export class TeamService implements ITeamService {
       {
         _id: teamId,
       },
-      { isDeleted: false }
+      { isDeleted: false },
     );
     if (!currentTeam) throw new NotFoundError("Team");
 
@@ -86,20 +87,20 @@ export class TeamService implements ITeamService {
       {
         _id: empId,
       },
-      { isDeleted: false }
+      { isDeleted: false },
     );
     if (!currentEmp) throw new NotFoundError("Employee");
 
     await await Team.findOneAndUpdate(
       { _id: teamId },
-      { $push: { members: empId } }
+      { $push: { members: empId } },
     );
 
     const updateTeam: ITeam | null = await Team.findOne(
       {
         _id: teamId,
       },
-      { isDeleted: false }
+      { isDeleted: false },
     );
     return updateTeam;
   }
@@ -109,9 +110,8 @@ export class TeamService implements ITeamService {
       {
         _id: empId,
       },
-      { isDeleted: false }
+      { isDeleted: false },
     );
-    console.log(empId);
     if (!currentEmp) throw new NotFoundError("Employee do not exist");
     if (currentEmp.role !== "Leader") throw new Error("Employee not a leader");
 
@@ -119,7 +119,7 @@ export class TeamService implements ITeamService {
       {
         _id: teamId,
       },
-      { isDeleted: false }
+      { isDeleted: false },
     );
 
     if (!currentTeam) throw new NotFoundError("Team do not exist");
@@ -130,7 +130,7 @@ export class TeamService implements ITeamService {
       {
         _id: teamId,
       },
-      { isDeleted: false }
+      { isDeleted: false },
     );
 
     return updateTeam;
@@ -145,19 +145,19 @@ export class TeamService implements ITeamService {
 
     if (!checkExistMember)
       throw new Error(
-        "This member do not in this team or Team's Id do not exist"
+        "This member do not in this team or Team's Id do not exist",
       );
 
     await await Team.findOneAndUpdate(
       { _id: teamId },
-      { $pull: { members: empId } }
+      { $pull: { members: empId } },
     );
 
     const updateTeam: ITeam | null = await Team.findOne(
       {
         _id: teamId,
       },
-      { isDeleted: false }
+      { isDeleted: false },
     );
 
     return updateTeam;
@@ -169,7 +169,11 @@ export class TeamService implements ITeamService {
     })
       .where("members")
       .in([empId])
-      .select("-members -leaderID -status -issDeleted");
+      .select("-members  -status -isDeleted")
+      .populate({
+        path: "leaderID",
+        select: "-password -_id -role -isDeleted -team",
+      });
     if (!listTeam) return null;
     return listTeam;
   }
@@ -178,7 +182,12 @@ export class TeamService implements ITeamService {
     const listMember: Array<ITeam> | null = await Team.find({
       leaderID: new Types.ObjectId(empId),
       isDeleted: false,
-    }).select("-members -leaderID -status -issDeleted");
+    })
+      .select("-members  -status -isDeleted")
+      .populate({
+        path: "leaderID",
+        select: "-password -_id -role -isDeleted -team",
+      });
     if (!listMember) return null;
     return listMember;
   }

@@ -18,7 +18,7 @@ export class EmployeeService implements IEmployeeService {
 
   async updateEmp(
     employee: IEmployee,
-    employeeId: string
+    employeeId: string,
   ): Promise<IReturnEmployee | null> {
     await this.getEmp(employeeId);
     // if (employee.password) {
@@ -26,11 +26,12 @@ export class EmployeeService implements IEmployeeService {
     //   employee.password = password;
     // }
     await Employee.findOneAndUpdate({ _id: employeeId }, employee);
+
     const updateEmp: IReturnEmployee | null = await await Employee.findOne(
       {
         _id: employeeId,
       },
-      { isDeleted: false }
+      { isDeleted: false },
     ).select("-password -isDeleted");
 
     return updateEmp;
@@ -52,7 +53,7 @@ export class EmployeeService implements IEmployeeService {
       {
         _id: employeeId,
       },
-      { isDeleted: false }
+      { isDeleted: false },
     ).select("-password -isDeleted");
     return deleteEmp;
   }
@@ -72,6 +73,7 @@ export class EmployeeService implements IEmployeeService {
 
   async getEmpList(role?: string): Promise<Array<IReturnEmployee> | null> {
     let condition = {};
+    console.log(role);
     switch (role) {
       case "Member":
         condition = { isDeleted: false, role: "Member" };
@@ -87,7 +89,7 @@ export class EmployeeService implements IEmployeeService {
         break;
     }
     const listEmp: Array<IReturnEmployee> | null = await Employee.find(
-      condition
+      condition,
     ).select("-password -isDeleted ");
     return listEmp;
   }
@@ -97,7 +99,7 @@ export class EmployeeService implements IEmployeeService {
       {
         _id: empId,
       },
-      { isDeleted: false }
+      { isDeleted: false },
     );
 
     if (!currentEmp) throw new NotFoundError("Employee do not exist");
@@ -111,7 +113,7 @@ export class EmployeeService implements IEmployeeService {
       {
         _id: empId,
       },
-      { isDeleted: false }
+      { isDeleted: false },
     );
 
     if (!currentEmp) throw new NotFoundError("Employee do not exist");

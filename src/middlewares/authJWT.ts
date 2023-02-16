@@ -7,7 +7,7 @@ import UnAuthorize from "../util/appErrors/errors/unauthorize.error";
 export function isLogin(
   request: Request,
   response: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const tokenString = request.header("Authorization");
@@ -31,7 +31,7 @@ export function isLogin(
 export function isAdmin(
   request: Request,
   response: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     Employee.findById(request.body["loginUser"]["id"]).exec(
@@ -48,7 +48,7 @@ export function isAdmin(
           return;
         }
         next(new UnAuthorize("UnAuthorized"));
-      }
+      },
     );
   } catch (error) {
     next(error);
@@ -58,7 +58,7 @@ export function isAdmin(
 export function isLeader(
   request: Request,
   response: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     Employee.findById(request.body["loginUser"]["id"]).exec(
@@ -72,7 +72,6 @@ export function isLeader(
           return;
         }
         const role = employee.role;
-        console.log(role);
         if (role === "Admin" || role === "Leader") {
           request.body["loginUser"]["role"] = role;
           next();
@@ -80,7 +79,7 @@ export function isLeader(
         }
 
         next(new UnAuthorize("UnAuthorized"));
-      }
+      },
     );
   } catch (error) {
     next(error);

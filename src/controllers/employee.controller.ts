@@ -28,7 +28,7 @@ export default class EmployeeController {
 
   constructor(
     @inject(TYPES.Employee) employeeService: IEmployeeService,
-    @inject(TYPES.Team) teamService: ITeamService
+    @inject(TYPES.Team) teamService: ITeamService,
   ) {
     this._employeeService = employeeService;
     this._teamService = teamService;
@@ -37,7 +37,7 @@ export default class EmployeeController {
   @httpPost(
     "/",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async addEmployee(request: Request, response: Response) {
     try {
@@ -69,11 +69,11 @@ export default class EmployeeController {
   @httpGet(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async getEmployee(request: Request, response: Response) {
     try {
-      const id = request.params.id;
+      const id = request.params["id"];
       const employee: IReturnEmployee = await this._employeeService.getEmp(id);
 
       if (!employee) throw new NotFoundError("Employee not found");
@@ -95,12 +95,12 @@ export default class EmployeeController {
   @httpPut(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async updateEmployee(request: Request, response: Response) {
     try {
-      const emp: IEmployee = request.body.employee;
-      const empId: string = request.params.id;
+      const emp: IEmployee = request.body["employee"];
+      const empId: string = request.params["id"];
 
       await this._employeeService.updateEmp(emp, empId);
 
@@ -113,11 +113,11 @@ export default class EmployeeController {
   @httpDelete(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async deleteEmp(request: Request, response: Response) {
     try {
-      const empId: string = request.params.id;
+      const empId: string = request.params["id"];
 
       await this._employeeService.deleteEmp(empId);
 
@@ -130,14 +130,14 @@ export default class EmployeeController {
   @httpGet(
     "/",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async getListEmployee(request: Request, response: Response) {
     try {
       const role: string = request.query["role"]
         ? request.query["role"].toString()
         : "All";
-      console.log(role);
+
       if (role == "Admin" && request.body["loginUser"]["role"] !== "Admin")
         throw new UnAuthorize("do not have permission");
 

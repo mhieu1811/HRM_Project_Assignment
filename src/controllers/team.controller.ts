@@ -24,7 +24,7 @@ export default class TeamsController {
 
   constructor(
     @inject(TYPES.Employee) employeeService: IEmployeeService,
-    @inject(TYPES.Team) teamService: ITeamService
+    @inject(TYPES.Team) teamService: ITeamService,
   ) {
     this._teamService = teamService;
     this._employeeService = employeeService;
@@ -33,13 +33,13 @@ export default class TeamsController {
   @httpPost(
     "/",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin")
+    container.get<express.RequestHandler>("isAdmin"),
   )
   async addTeam(request: Request, response: Response) {
     try {
       const team: ITeam = request.body;
       const empIsLeader: boolean = await this._employeeService.empIsLeader(
-        team.leaderID.toString()
+        team.leaderID.toString(),
       );
       if (!empIsLeader) throw new Error("Employee not a leader");
 
@@ -54,7 +54,7 @@ export default class TeamsController {
   @httpPost(
     "/assignMember",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async assignMember(request: Request, response: Response) {
     try {
@@ -75,7 +75,7 @@ export default class TeamsController {
   @httpPost(
     "/deleteMember",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async deleteMember(request: Request, response: Response) {
     try {
@@ -96,7 +96,7 @@ export default class TeamsController {
   @httpPost(
     "/assignLeader",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin")
+    container.get<express.RequestHandler>("isAdmin"),
   )
   async assignLeader(request: Request, response: Response) {
     try {
@@ -117,11 +117,12 @@ export default class TeamsController {
   @httpGet(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async getTeam(request: Request, response: Response) {
     try {
-      const id = request.params.id;
+      const id = request.params["id"];
+      if (!id) return response.status(404).json({ mesage: "id missing" });
       const team = await this._teamService.getTeam(id);
 
       if (team === null) throw new NotFoundError("Team");
@@ -135,12 +136,12 @@ export default class TeamsController {
   @httpPut(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin")
+    container.get<express.RequestHandler>("isAdmin"),
   )
   async updateTeam(request: Request, response: Response) {
     try {
       const team: ITeam = request.body.team;
-      const id: string = request.params.id;
+      const id: string = request.params["id"];
       await this._teamService.updateTeam(team, id);
       return response.status(201).json({ message: "update success" });
     } catch (error) {
@@ -151,7 +152,7 @@ export default class TeamsController {
   @httpDelete(
     "/:id",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isAdmin")
+    container.get<express.RequestHandler>("isAdmin"),
   )
   async deleteTeam(request: Request, response: Response) {
     try {
@@ -167,7 +168,7 @@ export default class TeamsController {
   @httpGet(
     "/",
     container.get<express.RequestHandler>("isLogin"),
-    container.get<express.RequestHandler>("isLeader")
+    container.get<express.RequestHandler>("isLeader"),
   )
   async getListTeam(request: Request, response: Response) {
     try {

@@ -27,7 +27,7 @@ export default class UserController {
   constructor(
     @inject(TYPES.User) userService: UserService,
     @inject(TYPES.Employee) employeeService: IEmployeeService,
-    @inject(TYPES.Team) teamService: ITeamService
+    @inject(TYPES.Team) teamService: ITeamService,
   ) {
     this._userService = userService;
     this._employeeService = employeeService;
@@ -40,14 +40,12 @@ export default class UserController {
       const loginUser: IUser = request.body;
       const data: loginReturnValue = await this._userService.login(loginUser);
 
-      return response
-        .status(200)
-        .json({
-          token: data.token,
-          email: data.email,
-          name: data.name,
-          role: data.role,
-        });
+      return response.status(200).json({
+        token: data.token,
+        email: data.email,
+        name: data.name,
+        role: data.role,
+      });
     } catch (error) {
       throw error;
     }
@@ -60,7 +58,7 @@ export default class UserController {
       const role = request.body["loginUser"]["role"];
 
       const personal: IReturnEmployee = await this._employeeService.getEmp(
-        userId
+        userId,
       );
 
       let team: Array<IListTeam> | null = null;
@@ -70,7 +68,6 @@ export default class UserController {
       } else if (role === "Member") {
         team = await this._teamService.getTeamByMember(userId);
       }
-
       return response.status(200).json({
         employee: {
           email: personal.email,
@@ -96,7 +93,7 @@ export default class UserController {
         logger.debug(teamId);
         const isMemberInTeam: boolean = await this._teamService.isMemberInTeam(
           teamId,
-          userId
+          userId,
         );
 
         if (!isMemberInTeam) throw new Error("This member not in this team");
