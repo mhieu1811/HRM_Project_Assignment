@@ -1,1 +1,58 @@
-<p>detail-team works!</p>
+<div class="container">
+  <p>Team Name: {{ team!.teamName }}</p>
+
+  <p>Leader: {{ team!.leaderID.name }}</p>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Role</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+
+    <ng-container *ngFor="let mem of members">
+      <tr>
+        <td>{{ mem.name }}</td>
+        <td>{{ mem.role }}</td>
+        <td>
+          <button
+            type="button"
+            class="btn btn-outline-danger"
+            (click)="deleteEmp(mem._id!)"
+          >
+            Delete Member
+          </button>
+        </td>
+      </tr>
+    </ng-container>
+  </table>
+  <div></div>
+  <p><b>--------Assign Member--------</b></p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Role</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+
+    <ng-container *ngFor="let mem of canAssignMember">
+      <tr>
+        <td>{{ mem.name }}</td>
+        <td>{{ mem.role }}</td>
+        <td>
+          <button
+            type="button"
+            class="btn btn-outline-success"
+            (click)="assignMember(mem._id!)"
+          >
+            Assign Member
+          </button>
+        </td>
+      </tr>
+    </ng-container>
+  </table>
+</div>

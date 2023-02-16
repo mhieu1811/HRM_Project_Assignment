@@ -24,6 +24,7 @@ export class DetailsEmployeeComponent {
       .getDetailsEmployee(this.id!)
       .subscribe((res: IPersonal) => {
         this.userInformation = res;
+        console.log(res);
       });
   }
 }

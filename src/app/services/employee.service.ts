@@ -20,7 +20,7 @@ export class EmployeeService {
         `Bearer ${this.cookieService.get('userToken')}`
       ),
     };
-
+    console.log(role);
     return this.http.get<Array<IEmployee>>(
       environment.api_url + '/employees?role=' + role,
       header

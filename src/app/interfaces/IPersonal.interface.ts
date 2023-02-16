@@ -1,4 +1,4 @@
-import { ITeam } from './ITeam.interface';
+import { IGetTeam, ITeam } from './ITeam.interface';
 
 export interface IPersonal {
   employee: {
@@ -6,5 +6,5 @@ export interface IPersonal {
     email: string;
     role: string;
   };
-  team: Array<ITeam>;
+  team: Array<IGetTeam>;
 }

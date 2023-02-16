@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import {
   AbstractControl,
@@ -9,7 +10,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { IEmployee } from 'src/app/interfaces/IEmployee.interface';
-import { ITeam } from 'src/app/interfaces/ITeam.interface';
+import { IGetTeam, ITeam } from 'src/app/interfaces/ITeam.interface';
 import { EmployeeService } from 'src/app/services/employee.service';
 import { TeamService } from 'src/app/services/team.service';
 
@@ -21,8 +22,8 @@ import { TeamService } from 'src/app/services/team.service';
 export class EditTeamComponent {
   public message: string = '';
   public listLeader!: Array<IEmployee>;
-  public id: string | undefined | null = '';
-  public currentTeam!: ITeam;
+  public id: string | undefined | null;
+  public currentTeam!: IGetTeam;
 
   public editForm: FormGroup = new FormGroup({
     name: new FormControl(''),
@@ -39,13 +40,18 @@ export class EditTeamComponent {
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id');
     if (!this.id) this.router.navigate(['/']);
-
-    this.teamService.getTeamDetails(this.id!).subscribe((res: ITeam) => {
-      this.currentTeam = res;
-      this.editForm = this.formBuilder.group({
-        name: [this.currentTeam.teamName, [Validators.required]],
+    this.employeeService
+      .getListEmployee('Leader')
+      .subscribe((res: Array<IEmployee>) => {
+        this.listLeader = res;
+        this.teamService.getTeamDetails(this.id!).subscribe((res: IGetTeam) => {
+          this.currentTeam = res;
+          this.editForm = this.formBuilder.group({
+            name: [this.currentTeam.teamName, [Validators.required]],
+            leaderId: [this.currentTeam.leaderID._id, [Validators.required]],
+          });
+        });
       });
-    });
   }
 
   get f(): { [key: string]: AbstractControl } {
@@ -66,8 +72,16 @@ export class EditTeamComponent {
   editTeam() {
     if (!this.editForm.dirty || this.editForm.invalid) return;
     const name: string = this.editForm.value['name'];
-    this.teamService.updateTeam({ teamName: name }, this.id!).subscribe(() => {
-      this.router.navigate(['/teams']);
-    });
+    const leaderId: string = this.editForm.value['leaderId'];
+    this.teamService
+      .updateTeam({ teamName: name, leaderID: leaderId }, this.id!)
+      .subscribe(
+        () => {
+          this.router.navigate(['/teams']);
+        },
+        (err: HttpErrorResponse) => {
+          this.message = err.error.message;
+        }
+      );
   }
 }

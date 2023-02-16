@@ -1,7 +1,55 @@
-<ul>
-  <li *ngFor="let team of listEmployees">
-    {{ team.name }}
-    {{ team.email }}
-    {{ team._id }}
-  </li>
-</ul>
+<div class="container">
+  <p class="text-justify"><b>Employee List</b></p>
+  <button
+    type="button"
+    class="btn btn-outline-primary"
+    [routerLink]="['/employees/add']"
+  >
+    Add new
+  </button>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Role</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+
+    <ng-container *ngFor="let emp of listEmployees; let i = index">
+      <tr>
+        <td>{{ emp.name }}</td>
+        <td>{{ emp.email }}</td>
+        <td>{{ emp.role }}</td>
+
+        <td>
+          <button
+            type="button"
+            class="btn btn-outline-primary mr-2 mt-2"
+            (click)="detailEmployee(emp._id!)"
+          >
+            Details
+          </button>
+          <span> </span>
+
+          <button
+            type="button"
+            class="btn btn-outline-secondary mr-2 mt-2"
+            (click)="editEmployee(emp._id!)"
+          >
+            Edit
+          </button>
+          <span> </span>
+          <button
+            type="button"
+            class="btn btn-outline-danger mr-2 mt-2"
+            (click)="deleteEmployee(emp._id!, i)"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+    </ng-container>
+  </table>
+</div>

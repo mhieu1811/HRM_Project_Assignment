@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
 import { IListTeam } from '../interfaces/IListTeam.interface';
 import { IMessage } from '../interfaces/IMessage.interface';
-import { ITeam } from '../interfaces/ITeam.interface';
+import { IGetTeam, ITeam } from '../interfaces/ITeam.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +27,7 @@ export class TeamService {
     );
   }
 
-  getTeamDetails(teamId: string): Observable<ITeam> {
+  getTeamDetails(teamId: string): Observable<IGetTeam> {
     const header = {
       headers: new HttpHeaders().set(
         'Authorization',
@@ -35,7 +35,7 @@ export class TeamService {
       ),
     };
 
-    return this.http.get<ITeam>(
+    return this.http.get<IGetTeam>(
       environment.api_url + '/teams/' + teamId,
       header
     );

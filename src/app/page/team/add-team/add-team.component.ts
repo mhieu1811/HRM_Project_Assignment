@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import {
   AbstractControl,
@@ -68,10 +69,13 @@ export class AddTeamComponent implements OnInit {
     const name: string = this.addForm.value['name'];
     const leaderId: string = this.addForm.value['leaderId'];
     console.log(name + ' ' + leaderId);
-    this.teamService
-      .addTeam({ teamName: name, leaderID: leaderId })
-      .subscribe((res: ITeam) => {
+    this.teamService.addTeam({ teamName: name, leaderID: leaderId }).subscribe(
+      (res: ITeam) => {
         console.log(res);
-      });
+      },
+      (err: HttpErrorResponse) => {
+        this.message = err.error.message;
+      }
+    );
   }
 }

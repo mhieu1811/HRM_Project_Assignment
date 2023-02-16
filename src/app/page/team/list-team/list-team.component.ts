@@ -19,12 +19,14 @@ export class ListTeamComponent {
   ) {}
   ngOnInit(): void {
     this.teamService.getListTeam().subscribe((res: Array<IListTeam>) => {
-      console.log(res);
       this.listTeam = res;
     });
   }
   editTeam(id: string) {
     this.router.navigate([`/teams/edit/${id}`]);
+  }
+  detailsTeam(id: string) {
+    this.router.navigate([`/teams/details/${id}`]);
   }
   deleteTeam(id: string, index: number): void {
     this.teamService.deleteTeam(id).subscribe((res) => {

@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import {
   AbstractControl,
@@ -72,8 +73,14 @@ export class AddEmployeeComponent {
     const role: string = this.addForm.value['role'];
     this.employeeService
       .addEmployee({ name: name, email: email, role: role })
-      .subscribe((res: IEmployee) => {
-        console.log(res);
-      });
+      .subscribe(
+        (res: IEmployee) => {
+          if (this.userRole === 'Admin') this.router.navigate(['/admin']);
+          else this.router.navigate(['/employees']);
+        },
+        (err: HttpErrorResponse) => {
+          this.message = err.error.message;
+        }
+      );
   }
 }
