@@ -1,0 +1,26 @@
+<div class="container">
+  <p><b>Personal Information</b></p>
+  <p>Name: {{ personalInfo.employee.name }}</p>
+  <p>Email: {{ personalInfo.employee.email }}</p>
+  <p>Role: {{ personalInfo.employee.role }}</p>
+
+  <p>List Team</p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Team Name</th>
+        <th scope="col">Leader</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+
+    <ng-container *ngFor="let team of personalInfo.team">
+      <tr>
+        <td>
+          <a [routerLink]="['/user/teams/', team._id]">{{ team.teamName }}</a>
+        </td>
+        <td>{{ team.leaderID!.name }}</td>
+      </tr>
+    </ng-container>
+  </table>
+</div>

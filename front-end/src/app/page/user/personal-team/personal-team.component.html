@@ -1,0 +1,22 @@
+<div class="container">
+  <p>Team Name: {{ team!.teamName }}</p>
+
+  <p>Leader: {{ team!.leaderID.name }}</p>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Role</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+
+    <ng-container *ngFor="let mem of members">
+      <tr>
+        <td>{{ mem.name }}</td>
+        <td>{{ mem.role }}</td>
+      </tr>
+    </ng-container>
+  </table>
+</div>

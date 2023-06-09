@@ -1,0 +1,68 @@
+<div class="container">
+  <div class="heading">
+    <h2 class="mb-2">Add employee</h2>
+  </div>
+  <p style="color: red">{{ message }}</p>
+  <form class="" [formGroup]="addForm" (ngSubmit)="addEmployee()">
+    <div class="row g-3 align-items-center">
+      <div class="col-auto">
+        <label for="email"> Email </label>
+      </div>
+      <div class="col-auto">
+        <input
+          id="email"
+          class=""
+          type="text"
+          formControlName="email"
+          [ngClass]="f['email'].errors"
+        />
+        <div *ngIf="f['email'].errors && f['email'].dirty" class="is-invalid">
+          <div *ngIf="f['email'].errors['required']" style="color: red">
+            Email is required
+          </div>
+          <div *ngIf="f['email'].errors['pattern']" style="color: red">
+            Email is invalid
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 align-items-center mt-2">
+      <div class="col-auto">
+        <label for="email"> Name </label>
+      </div>
+      <div class="col-auto">
+        <input
+          id="name"
+          class=""
+          type="text"
+          formControlName="name"
+          [ngClass]="f['name'].errors"
+        />
+        <div *ngIf="f['name'].errors && f['name'].dirty" class="is-invalid">
+          <div *ngIf="f['name'].errors['required']">name is required</div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="userRole === 'Admin'">
+      <div class="row g-3 align-items-center mt-2">
+        <div class="col-auto">
+          <label for="role"> Role </label>
+        </div>
+        <div class="col-auto">
+          <select (change)="changeRole($event)" formControlName="role">
+            <option *ngFor="let role of roleOptions" [ngValue]="role">
+              {{ role }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <input
+      type="submit"
+      value="Submit"
+      class="btn btn-outline-primary mt-3 btn-block"
+    />
+  </form>
+</div>

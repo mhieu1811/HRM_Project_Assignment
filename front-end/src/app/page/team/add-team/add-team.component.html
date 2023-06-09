@@ -1,0 +1,48 @@
+<div class="container">
+  <div class="heading">
+    <h2 class="mb-2">Add Team</h2>
+  </div>
+  <p style="color: red">{{ message }}</p>
+  <form [formGroup]="addForm" (ngSubmit)="addTeam()">
+    <div class="row g-3 align-items-center">
+      <div class="col-auto">
+        <label for="name"> Team Name </label>
+      </div>
+      <div class="col-auto">
+        <input
+          id="name"
+          class=""
+          type="text"
+          formControlName="name"
+          [ngClass]="f['name'].errors"
+        />
+        <div *ngIf="f['name'].errors && f['name'].dirty" class="is-invalid">
+          <div *ngIf="f['name'].errors['required']" style="color: red">
+            Name is required
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row g-3 align-items-center mt-2">
+      <div class="col-auto">
+        <label for="leaderId"> Leader </label>
+      </div>
+      <div class="col-auto">
+        <select (change)="changeLeader($event)" formControlName="leaderId">
+          <option
+            *ngFor="let leader of listLeader; let index = index"
+            [ngValue]="listLeader[index]._id"
+          >
+            {{ leader.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <input
+      type="submit"
+      value="Submit"
+      class="btn btn-outline-primary mt-3 btn-block"
+    />
+  </form>
+</div>
